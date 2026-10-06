@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const controller = require('../Controllers/LeaguesController');
+
+const controller = require('../Controller/LeaguesController');
 
 router.get('/', controller.getLeagues);
+
+module.exports = router;
