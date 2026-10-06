@@ -1,5 +1,4 @@
 // fetch League Data
-
 const League = require("../Models/League.");
 
 async function getLeagues(leagueId){
@@ -18,6 +17,35 @@ async function getLeagues(leagueId){
     return response.json();
 }
 
+async function syncLeague(leagueId) {
+
+    const data = await fetchLeaguefromAPI(leagueId);
+
+    const apieague = data.response[0];
+
+    const leagueData = {
+        apiId: apieague.league.id,
+        name: apieague.league.name,
+        type: apieague.league.type,
+        logo: apieague.league.logo,
+
+        country: {
+            name: apieague.country.name,
+            code: apieague.country.code,
+            flag: apieague.country.flag
+        }
+    };
+
+    await League.updateOne(
+        { apiId: leagueData.apiId },
+        { $set: leagueData },
+        { upsert: true }
+    );
+
+    return leagueData;
+}
+
 module.exports = {
-    getLeagues
+    getLeagues,
+    syncLeague
 };
