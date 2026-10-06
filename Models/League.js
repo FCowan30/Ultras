@@ -4,20 +4,20 @@ const mongoose = require('mongoose');
 
 const leagueSchema = new mongoose.Schema({
     apiId:{
-        type: number,
+        type: Number,
         required: true,
         unique: true
     },
 
     name:{
-        type:string,
+        type:String,
         required: true
     },
 
     country:{
-        name: string,
-        code: string,
-        flag: string
+        name: String,
+        code: String,
+        flag: String
     },
 
 });

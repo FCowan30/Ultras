@@ -1,51 +1,64 @@
-// fetch League Data
-const League = require("../Models/League.");
+const League = require("../Models/League");
 
-async function getLeagues(leagueId){
+
+// Get league data from API-Football
+async function fetchLeagueFromAPI(leagueId) {
+
     const response = await fetch(
-        "https://api-football-v1.p.rapidapi.com/v3/leagues?id=${leagueId}",
+        `https://v3.football.api-sports.io/leagues?id=${leagueId}`,
         {
+            method: "GET",
             headers: {
-                "X-RapidAPI-Key": process.env.API_KEY
+                "x-apisports-key": process.env.API_KEY
             }
         }
     );
+
     if (!response.ok) {
-        throw new Error(`API requrest failed: ${response.status}`);
+        const errorBody = await response.text();
+
+        throw new Error(
+            `API request failed: ${response.status} - ${errorBody}`
+        );
     }
 
     return response.json();
 }
 
+
+// Get API data and store/update it in MongoDB
 async function syncLeague(leagueId) {
 
-    const data = await fetchLeaguefromAPI(leagueId);
+    const data = await fetchLeagueFromAPI(leagueId);
 
-    const apieague = data.response[0];
+    const apiLeague = data.response[0];
 
     const leagueData = {
-        apiId: apieague.league.id,
-        name: apieague.league.name,
-        type: apieague.league.type,
-        logo: apieague.league.logo,
+        apiId: apiLeague.league.id,
+        name: apiLeague.league.name,
+        type: apiLeague.league.type,
+        logo: apiLeague.league.logo,
 
         country: {
-            name: apieague.country.name,
-            code: apieague.country.code,
-            flag: apieague.country.flag
+            name: apiLeague.country.name,
+            code: apiLeague.country.code,
+            flag: apiLeague.country.flag
         }
     };
 
-    await League.updateOne(
+    const result = await League.updateOne(
         { apiId: leagueData.apiId },
         { $set: leagueData },
         { upsert: true }
     );
 
+    console.log("MongoDB update result:", result);
+
     return leagueData;
 }
 
+
 module.exports = {
-    getLeagues,
+    fetchLeagueFromAPI,
     syncLeague
 };
