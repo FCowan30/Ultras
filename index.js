@@ -25,9 +25,13 @@ app.use(express.static(public));
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 
-const router = require('./Routes/LeaguesRouter');
+const leaguesrouter = require('./Routes/LeaguesRouter');
+const teamsrouter = require('./Routes/TeamRoutes');
+const fixturesrouter = require('./Routes/fixturesrouter');
 
-app.use('/', router);
+app.use('/leagues', leaguesrouter);
+app.use('/teams', teamsrouter);
+app.use('/fixtures', fixturesrouter);
 
 app.listen(3000, () => {
     console.log('Server is running on port 3000. ctrl^c to quit');
